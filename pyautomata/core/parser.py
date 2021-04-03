@@ -17,23 +17,24 @@ class AutomataParser(Parser):
     @property
     def input_string(self) -> str:
         """
-        Devolve a string de input
+        Returns the input string
         """
         return self._input_string
 
     @input_string.setter
     def input_string(self, s: str) -> None:
         """
-        Dada uma string s, atribui s à input_string
+        Changes the input string for the program
         """
         self._input_string = s
 
+    @staticmethod
     def description_parse(
         self, description: str
     ) -> Dict[str, Union[str, List[str]]]:
         """
-        Faz o parsing da linha de descrição
-        retorna um dicionário com as informações
+        Parses the description line
+        returns a dictionary with the information
         """
         initial_description_results = re.findall(
             r"\w+(?==\()|(?<={)[\w+,]+(?=})|(?<=,)\w+(?=,)",
@@ -47,12 +48,13 @@ class AutomataParser(Parser):
             "final_states": initial_description_results[5].split(","),
         }
 
+    @staticmethod
     def program_function_parse(
         self, program_function: str
     ) -> Dict[Tuple[str, str], str]:
         """
-        Faz o parsing da função programa
-        retorna um dicinário que espera uma tupla como chave (estado, palavra)
+        Parses the program function
+        returns a dictionary that waits for a tuple as a key (state, word)
         """
         program_function_results = re.findall(
             r"(?<=\()\w+,\w+(?=\)=)|(?<==)\w+", program_function
@@ -68,12 +70,12 @@ class AutomataParser(Parser):
         self,
     ) -> Tuple[Dict[str, Union[str, List[str]]], Dict[Tuple[str, str], str]]:
         """
-        Executa o parsing inteiro, retorna os dois dicinários
-        (descrição, função programa)
+        Run the whole parsing
+        Returns 2 dictionaries: (description, program function)
         """
-        splitted_string = self.input_string.split("\n")
-        initial_description = splitted_string[0]
-        program_function = "".join(splitted_string[2:])
+        split_string = self.input_string.split("\n")
+        initial_description = split_string[0]
+        program_function = "".join(split_string[2:])
         description_dict = self.description_parse(initial_description)
         program_dict = self.program_function_parse(program_function)
         return description_dict, program_dict
