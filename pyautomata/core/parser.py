@@ -30,15 +30,14 @@ class AutomataParser(Parser):
 
     @staticmethod
     def description_parse(
-        self, description: str
+        description: str,
     ) -> Dict[str, Union[str, List[str]]]:
         """
         Parses the description line
         returns a dictionary with the information
         """
         initial_description_results = re.findall(
-            r"\w+(?==\()|(?<={)[\w+,]+(?=})|(?<=,)\w+(?=,)",
-            description,
+            r"\w+(?==\()|(?<={)[\w+,]+(?=})|(?<=,)\w+(?=,)", description,
         )
         return {
             "name": initial_description_results[0],
@@ -50,7 +49,7 @@ class AutomataParser(Parser):
 
     @staticmethod
     def program_function_parse(
-        self, program_function: str
+        program_function: str,
     ) -> Dict[Tuple[str, str], str]:
         """
         Parses the program function

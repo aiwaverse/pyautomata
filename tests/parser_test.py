@@ -6,8 +6,8 @@ from pyautomata import AutomataParser  # pylint: disable=import-error
 
 class TestAutomataParser:
     """
-    Classe de teste para AutomataParser
-    a ser rodada com python3.9 -m pytest
+    AutomataParser test class
+    Run with python3.9 -m pytest
     """
 
     test_string = "AUTÔMATO=({q0,q1,q2,q3},{a,b},Prog,q0,{q1,q3})\n\
