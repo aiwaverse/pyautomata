@@ -13,6 +13,7 @@ class Automata:
         """
         self.name: str = kwargs["name"]
         self.states: List[str] = kwargs["states"]
+        self.alphabet: List[str] = kwargs["alphabet"]
         self.initial_state: str = kwargs["initial_state"]
         self.final_states: List[str] = kwargs["final_states"]
         self.program_function: Dict[Tuple[str, str], str] = program_function
