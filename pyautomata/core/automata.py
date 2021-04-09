@@ -7,7 +7,9 @@ class Automata:
     The class that represents an Automata
     """
 
-    def __init__(self, program_function, **kwargs) -> None:
+    def __init__(
+        self, program_function: Dict[Tuple[str, str], str], **kwargs
+    ) -> None:
         """
         To initialize an Automata, pass the program function dictionary
         and the unpacked dictionary of info
