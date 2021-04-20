@@ -10,6 +10,21 @@ class Parser(abc.ABC):
         pass
 
 
+class WordFileParser(Parser):
+    def __init__(self, f: str) -> None:
+        self.file_name = f
+
+    def parse(self) -> List[Tuple[str, str]]:
+        with open(self.file_name) as f:
+            content = f.read()
+        results = re.findall(r"\w*,\w*", content)
+        to_return: List[Tuple[str, str]] = []
+        for w in results:
+            splitted: List[str] = w.split(",")
+            to_return.append((splitted[0], splitted[1]))
+        return to_return
+
+
 class AutomataParser(Parser):
     def __init__(self, input_string: str) -> None:
         self._input_string = input_string
