@@ -10,6 +10,41 @@ class Parser(abc.ABC):
         pass
 
 
+class WordFileParser(Parser):
+    """
+    The class that models the parser for the words file
+    """
+
+    def __init__(self, *, file_name: str = None, content: str = None) -> None:
+        """
+        The constructor, either a file_name or a content
+        If both are provided, file_name is used
+        If none are provided, ValueError is raised
+        """
+        if file_name:
+            with open(file_name) as f:
+                self.content = f.read()
+        elif content:
+            self.content = content
+        else:
+            raise ValueError(
+                "Either file_name or content must be provided"
+                "(file_name is prioritized)"
+            )
+
+    def parse(self) -> List[Tuple[str, str]]:
+        """
+        Parse the contents and return a list of tuples
+        With all the words
+        """
+        results = re.findall(r"\w*,\w*", self.content)
+        to_return: List[Tuple[str, str]] = []
+        for w in results:
+            splitted: List[str] = w.split(",")
+            to_return.append((splitted[0], splitted[1]))
+        return to_return
+
+
 class AutomataParser(Parser):
     def __init__(self, input_string: str) -> None:
         self._input_string = input_string
@@ -37,7 +72,8 @@ class AutomataParser(Parser):
         returns a dictionary with the information
         """
         initial_description_results = re.findall(
-            r"\w+(?==\()|(?<={)[\w+,]+(?=})|(?<=,)\w+(?=,)", description,
+            r"\w+(?==\()|(?<={)[\w+,]+(?=})|(?<=,)\w+(?=,)",
+            description,
         )
         return {
             "name": initial_description_results[0],
