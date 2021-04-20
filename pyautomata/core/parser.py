@@ -17,7 +17,7 @@ class WordFileParser(Parser):
 
     def __init__(self, *, file_name: str = None, content: str = None) -> None:
         """
-        The constructor, either a file_name or a content
+        The constructor, either a file_name or a content must be provided
         If both are provided, file_name is used
         If none are provided, ValueError is raised
         """
