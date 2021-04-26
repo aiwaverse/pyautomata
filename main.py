@@ -121,7 +121,7 @@ def main():
     automata = None
     while True:
         event, values = aut_window.read()
-        if event == sg.WIN_CLOSED:
+        if event == sg.WIN_CLOSED or event == "Close":
             break
         if event == "-AUTOMATA-SUBMIT-":
             automata = create_automata(aut_window, values["-AUTOMATA-FILE-"])
