@@ -19,7 +19,7 @@ class TestAutomataParser:
                     (q2,b)=q2\n\
                     (q3,a)=q3\n\
                     (q3,b)=q2"
-        self.p = AutomataParser(test_string)
+        self.p = AutomataParser(content=test_string)
         self.description_dict, self.function_dict = self.p.parse()
 
     def test_name(self):
