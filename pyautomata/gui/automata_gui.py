@@ -146,14 +146,3 @@ def setup() -> sg.Window:
         [sg.CloseButton("Close")],
     ]
     return sg.Window("Pyautomata", layout)
-
-
-# %%
-if __name__ == "__main__":
-    w = setup()
-    while True:
-        event, values = w.read()
-        print(event, values)
-        if event == sg.WIN_CLOSED or event == "AUTOMATA-SUBMIT":
-            break
-    w.close()
