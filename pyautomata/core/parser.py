@@ -1,3 +1,4 @@
+# %%
 import abc
 import re
 from more_itertools import grouper
@@ -46,22 +47,36 @@ class WordFileParser(Parser):
 
 
 class AutomataParser(Parser):
-    def __init__(self, input_string: str) -> None:
-        self._input_string = input_string
+    def __init__(self, *, file_name: str = None, content: str = None) -> None:
+        """
+        The constructor, either a file_name or a content must be provided
+        If both are provided, file_name is used
+        If none are provided, ValueError is raised
+        """
+        if file_name:
+            with open(file_name) as f:
+                self.content = f.read()
+        elif content:
+            self.content = content
+        else:
+            raise ValueError(
+                "Either file_name or content must be provided"
+                "(file_name is prioritized)"
+            )
 
     @property
-    def input_string(self) -> str:
+    def content(self) -> str:
         """
         Returns the input string
         """
-        return self._input_string
+        return self._content
 
-    @input_string.setter
-    def input_string(self, s: str) -> None:
+    @content.setter
+    def content(self, s: str) -> None:
         """
         Changes the input string for the program
         """
-        self._input_string = s
+        self._content = s
 
     @staticmethod
     def description_parse(
@@ -108,9 +123,11 @@ class AutomataParser(Parser):
         Run the whole parsing
         Returns 2 dictionaries: (description, program function)
         """
-        split_string = self.input_string.split("\n")
+        split_string = self.content.split("\n")
         initial_description = split_string[0]
         program_function = "".join(split_string[2:])
         description_dict = self.description_parse(initial_description)
         program_dict = self.program_function_parse(program_function)
         return description_dict, program_dict
+
+# %%
