@@ -123,14 +123,15 @@ def setup() -> sg.Window:
             sg.Text("Not loaded", key="-AUTOMATA-LOADED-"),
         ],
         [
-            sg.Text("Word:"),
+            sg.Text("Last word:"),
             sg.Text("No word loaded", key="-WORD-TO-TEST-"),
         ],
         [
+            sg.Text("Word:"),
             sg.InputText(
-                default_text="Write here the word to be tested",
                 key="-WORD-INPUT-",
-                do_not_clear=False,
+                do_not_clear=False
+                
             ),
             sg.Button(button_text="Test", key="-WORD-BUT-", disabled=True),
         ],
