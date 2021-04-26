@@ -1,3 +1,4 @@
+# %%
 import abc
 import re
 from more_itertools import grouper
@@ -128,3 +129,5 @@ class AutomataParser(Parser):
         description_dict = self.description_parse(initial_description)
         program_dict = self.program_function_parse(program_function)
         return description_dict, program_dict
+
+# %%
