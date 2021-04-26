@@ -26,10 +26,10 @@ def create_pair_result_window(pairs: List[Tuple[str, str]]) -> None:
     for word1, word2 in pairs:
         pair_string += f"{word1}, {word2}\n"
     layout = [
-            [sg.Text(f"Accepted pairs:")],
-            [sg.Text(pair_string)],
-            [sg.Button("Ok")],
-        ]
+        [sg.Text(f"Accepted pairs:")],
+        [sg.Text(pair_string)],
+        [sg.Button("Ok")],
+    ]
     window = sg.Window("Pyautomata", layout)
     while True:
         event, _ = window.read()
@@ -128,23 +128,19 @@ def setup() -> sg.Window:
         ],
         [
             sg.Text("Word:"),
-            sg.InputText(
-                key="-WORD-INPUT-",
-                do_not_clear=False
-                
-            ),
+            sg.InputText(key="-WORD-INPUT-", do_not_clear=False),
             sg.Button(button_text="Test", key="-WORD-BUT-", disabled=True),
         ],
         [
             sg.Text("Automata File", size=(16, 1)),
             sg.Input(key="-AUTOMATA-FILE-"),
-            sg.FileBrowse(),
+            sg.FileBrowse(file_types=(("Text Files", "*.txt"),)),
             sg.Submit(key="-AUTOMATA-SUBMIT-"),
         ],
         [
             sg.Text("Words File", size=(16, 1)),
             sg.Input(key="-WORD-FILE-"),
-            sg.FileBrowse(),
+            sg.FileBrowse(file_types=(("Text Files", "*.txt"),)),
             sg.Submit(key="-WORD-FILE-SUBMIT-", disabled=True),
         ],
         [sg.CloseButton("Close")],
