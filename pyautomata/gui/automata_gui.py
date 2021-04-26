@@ -33,6 +33,7 @@ def setup() -> sg.Window:
             sg.FileBrowse(),
             sg.Submit(key="-WORD-FILE-SUBMIT-", disabled=True),
         ],
+        [sg.CloseButton("Close")],
     ]
     return sg.Window("Pyautomata", layout)
 
