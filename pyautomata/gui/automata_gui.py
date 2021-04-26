@@ -6,25 +6,32 @@ def setup() -> sg.Window:
     sg.theme("DarkGrey8")
     layout = [
         [
-            sg.Text("Autômato: "),
-            sg.Text("Não carregado", key="-AUTOMATA-LOADED-"),
-        ],
-        [sg.Text("Palavra:"), sg.Text("", key="-WORD-TO-TEST-")],
-        [
-            sg.InputText(default_text="Escreva aqui a palavra a ser testada."),
-            sg.Button(button_text="Testar", key="-WORD-BUT-", disabled=True),
+            sg.Text("Automata: "),
+            sg.Text("Not loaded", key="-AUTOMATA-LOADED-"),
         ],
         [
-            sg.Text("Arquivo Autômato", size=(16, 1)),
+            sg.Text("Word:"),
+            sg.Text("No word loaded", key="-WORD-TO-TEST-"),
+        ],
+        [
+            sg.InputText(
+                default_text="Write here the word to be tested",
+                key="-WORD-INPUT-",
+                do_not_clear=False,
+            ),
+            sg.Button(button_text="Test", key="-WORD-BUT-", disabled=True),
+        ],
+        [
+            sg.Text("Automata File", size=(16, 1)),
             sg.Input(key="-AUTOMATA-FILE-"),
             sg.FileBrowse(),
             sg.Submit(key="-AUTOMATA-SUBMIT-"),
         ],
         [
-            sg.Text("Arquivo Palavras", size=(16, 1)),
+            sg.Text("Words File", size=(16, 1)),
             sg.Input(key="-WORD-FILE-"),
             sg.FileBrowse(),
-            sg.Submit(key="-WORD-FILE-SUBMIT-"),
+            sg.Submit(key="-WORD-FILE-SUBMIT-", disabled=True),
         ],
     ]
     return sg.Window("Pyautomata", layout)
