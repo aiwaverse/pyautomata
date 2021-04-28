@@ -9,6 +9,9 @@ class MinimizedAutomata(Automata):
         super().__init__(program_function, **kwargs)
 
     def remove_unreachable_states(self) -> None:
+        """
+        Removes the unreachable states of the Automata
+        """
         states = self.unreacheable_states()
         for state in states:
             for c in self.alphabet:
@@ -16,6 +19,12 @@ class MinimizedAutomata(Automata):
                     self.program_function.pop((state, c))
 
     def unreacheable_states(self) -> List[str]:
+        """
+        Determines the unreachable states of the Automata
+        | -> set union
+        & -> set intersection
+        - -> set difference
+        """
         reacheable_states: Set[str] = set([self.initial_state])
         new_states: Set[str] = set([self.initial_state])
         while new_states:
