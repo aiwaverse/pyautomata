@@ -52,7 +52,26 @@ class MinimizedAutomata(Automata):
         unreachable_states = set(self.states) - reacheable_states
         return list(unreachable_states)
 
-    def hopcroft_alogrithm(self):
+    def make_state_name(self, states: frozenset[str]):
+        list_states = list(states)
+        list_states.sort()
+        return "".join(list_states)
+
+    def unify_states(self):
+        """
+        Using the equivalency classes of the hopcroft
+        algorithm, unifies non-distinguishable states
+        """
+        equivalency_classes = {
+            c: self.make_state_name(c) for c in self.hopcroft_alogrithm()
+        }
+        for equivalency_class in equivalency_classes:
+            if len(equivalency_class) <= 1:
+                continue
+            
+
+
+    def hopcroft_alogrithm(self) -> Set[frozenset[str]]:
         final_states_set = frozenset(self.final_states)
         non_final_states_set = frozenset(self.states) - frozenset(
             self.final_states
