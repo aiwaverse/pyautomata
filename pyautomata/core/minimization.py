@@ -1,4 +1,5 @@
-from pyautomata.core.automata import Automata  # pylint: disable=import-error
+# %%
+from pyautomata import Automata  # pylint: disable=import-error
 from typing import Dict, Set, Tuple, List
 import itertools
 import copy
@@ -51,102 +52,44 @@ class MinimizedAutomata(Automata):
         unreachable_states = set(self.states) - reacheable_states
         return list(unreachable_states)
 
-    def create_total_function(self) -> Dict[Tuple[str, str], str]:
-        total_program_function = copy.deepcopy(self.program_function)
-        for state in self.states:
+    def hopcroft_alogrithm(self):
+        final_states_set = frozenset(self.final_states)
+        non_final_states_set = frozenset(self.states) - frozenset(
+            self.final_states
+        )
+        p: Set[frozenset[str]] = set([final_states_set, non_final_states_set])
+        new_p = copy.deepcopy(p)
+        w: Set[frozenset[str]] = set([final_states_set, non_final_states_set])
+        while w:
+            a = w.pop()
             for c in self.alphabet:
-                if (state, c) in self.program_function:
-                    continue
-                total_program_function[(state, c)] = "Undefined"
-                total_program_function[("Undefined", c)] = "Undefined"
-        return total_program_function
-
-    def check_identical_states(
-        self, state_pairs: List[Tuple[str, str]]
-    ) -> bool:
-        for state_pair in state_pairs:
-            if state_pair[0] != state_pair[1]:
-                return False
-        return True
-
-    def minimize(self):
-        # creates the total function
-        total_program_function = self.create_total_function()
-        # a dictionary of tuples to the actual pairs with properties
-        table_pair = {
-            pair: MinimizationTable(pair)
-            for pair in itertools.combinations(self.states + ["Undefined"], 2)
-        }
-        # marking the pairs which one is final and the other non-final
-        for pair in table_pair.values():
-            if (
-                pair.state1 in self.final_states
-                and pair.state2 not in self.final_states
-                or pair.state1 not in self.final_states
-                and pair.state2 in self.final_states
-            ):
-                pair.distinguishable = True
-        for pair, table_element in table_pair.items():
-            results: List[Tuple[str, str]] = []
-            for c in self.alphabet:
-                results.append(
-                    (
-                        total_program_function[(table_element.state1, c)],
-                        total_program_function[(table_element.state2, c)],
-                    )
+                x = set(
+                    [
+                        state
+                        for (
+                            state,
+                            character,
+                        ), result_state in self.program_function.items()
+                        if result_state in a and character == c
+                    ]
                 )
-            if self.check_identical_states(results):
-                continue
-            for result in results:
-                # if one of the results is distinguishable
-                # means the pair also needs to be distinguishable
-                # TODO: this needs to be recurisve,
-                # probably under a new function
-                if table_pair[result].distinguishable:
-                    self.make_distinguishable(table_pair, table_element)
-                    table_element.distinguishable = True
-                else:
-                    table_pair[result].dependencies.append(pair)
-            self.unify_pairs(table_pair)
-            self.remove_undefined()
+                p = copy.deepcopy(new_p)
+                for y in p:
+                    if x & y == set() or y - x == set():
+                        continue
+                    new_p.remove(y)
+                    new_p.add(frozenset(x & y))
+                    new_p.add(y - x)
+                    if y in w:
+                        w.remove(y)
+                        w.add(frozenset(x & y))
+                        w.add(y - x)
+                    else:
+                        if (x & y) <= (y - x):
+                            w.add(frozenset(x & y))
+                        else:
+                            w.add(y - x)
+        return p
 
-    def remove_undefined(self):
-        for state in self.states:
-            for c in self.alphabet:
-                pass
 
-    def unify_pairs(self, table: Dict[Tuple[str, str], MinimizationTable]):
-        for tup, elem in table.items():
-            if elem.distinguishable:
-                continue
-            new_name = [tup[0], tup[1]]
-            new_name.sort()
-            new_name = "".join(new_name)
-            for (state, c), result_state in self.create_total_function().items():
-                if result_state == tup[0] or result_state == tup[1]:
-                    self.program_function[(state, c)] = new_name
-            for c in self.alphabet:
-                states0 = self.program_function[(tup[0], c)]
-                states1 = self.program_function[(tup[1], c)]
-                state_name = [states0, states1]
-                state_name.sort()
-                state_name = "".join(new_name)
-                if states0 == states1:
-                    self.program_function.pop((states0, c))
-                    self.program_function.pop((states1, c))
-                    self.program_function[(new_name, c)] = states0
-                else:
-                    self.program_function.pop((states0, c))
-                    self.program_function.pop((states1, c))
-                    self.program_function[(new_name, c)] = state_name
-
-    def make_distinguishable(
-        self,
-        full_table: Dict[Tuple[str, str], MinimizationTable],
-        curr_table_element: MinimizationTable,
-    ):
-        curr_table_element.distinguishable = True
-        for depedency in curr_table_element.dependencies:
-            self.make_distinguishable(
-                full_table, full_table[depedency]
-            )
+# %%
