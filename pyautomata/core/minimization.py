@@ -17,6 +17,7 @@ class MinimizedAutomata(Automata):
         self, program_function: Dict[Tuple[str, str], str], **kwargs
     ) -> None:
         super().__init__(program_function, **kwargs)
+        self.remove_unreachable_states()
 
     def remove_unreachable_states(self) -> None:
         """
@@ -57,6 +58,7 @@ class MinimizedAutomata(Automata):
                 if (state, c) in self.program_function:
                     continue
                 total_program_function[(state, c)] = "Undefined"
+                total_program_function[("Undefined", c)] = "Undefined"
         return total_program_function
 
     def check_identical_states(
@@ -105,18 +107,30 @@ class MinimizedAutomata(Automata):
                     table_element.distinguishable = True
                 else:
                     table_pair[result].dependencies.append(pair)
+            self.unify_pairs(table_pair)
+            self.remove_undefined()
+
+    def remove_undefined(self):
+        for state in self.states:
+            for c in self.alphabet:
+                pass
 
     def unify_pairs(self, table: Dict[Tuple[str, str], MinimizationTable]):
         for tup, elem in table.items():
             if elem.distinguishable:
                 continue
-            new_name = tup[0] + tup[1]
-            for (state, c), result_state in self.program_function.items():
+            new_name = [tup[0], tup[1]]
+            new_name.sort()
+            new_name = "".join(new_name)
+            for (state, c), result_state in self.create_total_function().items():
                 if result_state == tup[0] or result_state == tup[1]:
                     self.program_function[(state, c)] = new_name
             for c in self.alphabet:
                 states0 = self.program_function[(tup[0], c)]
                 states1 = self.program_function[(tup[1], c)]
+                state_name = [states0, states1]
+                state_name.sort()
+                state_name = "".join(new_name)
                 if states0 == states1:
                     self.program_function.pop((states0, c))
                     self.program_function.pop((states1, c))
@@ -124,7 +138,7 @@ class MinimizedAutomata(Automata):
                 else:
                     self.program_function.pop((states0, c))
                     self.program_function.pop((states1, c))
-                    self.program_function[(new_name, c)] = states0 + states1
+                    self.program_function[(new_name, c)] = state_name
 
     def make_distinguishable(
         self,
