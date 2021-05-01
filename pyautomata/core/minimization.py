@@ -4,6 +4,14 @@ import itertools
 import copy
 
 
+class MinimizationTable:
+    def __init__(self, states: Tuple[str, str]) -> None:
+        self.state1 = states[0]
+        self.state2 = states[1]
+        self.distinguishable = False
+        self.dependencies: List[Tuple[str, str]] = []
+
+
 class MinimizedAutomata(Automata):
     def __init__(
         self, program_function: Dict[Tuple[str, str], str], **kwargs
@@ -93,14 +101,38 @@ class MinimizedAutomata(Automata):
                 # TODO: this needs to be recurisve,
                 # probably under a new function
                 if table_pair[result].distinguishable:
+                    self.make_distinguishable(table_pair, table_element)
                     table_element.distinguishable = True
-                    break
-                # TODO: Deal with non-distinguishable
+                else:
+                    table_pair[result].dependencies.append(pair)
 
+    def unify_pairs(self, table: Dict[Tuple[str, str], MinimizationTable]):
+        for tup, elem in table.items():
+            if elem.distinguishable:
+                continue
+            new_name = tup[0] + tup[1]
+            for (state, c), result_state in self.program_function.items():
+                if result_state == tup[0] or result_state == tup[1]:
+                    self.program_function[(state, c)] = new_name
+            for c in self.alphabet:
+                states0 = self.program_function[(tup[0], c)]
+                states1 = self.program_function[(tup[1], c)]
+                if states0 == states1:
+                    self.program_function.pop((states0, c))
+                    self.program_function.pop((states1, c))
+                    self.program_function[(new_name, c)] = states0
+                else:
+                    self.program_function.pop((states0, c))
+                    self.program_function.pop((states1, c))
+                    self.program_function[(new_name, c)] = states0 + states1
 
-class MinimizationTable:
-    def __init__(self, states: Tuple[str, str]) -> None:
-        self.state1 = states[0]
-        self.state2 = states[1]
-        self.distinguishable = False
-        self.dependencies = []
+    def make_distinguishable(
+        self,
+        full_table: Dict[Tuple[str, str], MinimizationTable],
+        curr_table_element: MinimizationTable,
+    ):
+        curr_table_element.distinguishable = True
+        for depedency in curr_table_element.dependencies:
+            self.make_distinguishable(
+                full_table, full_table[depedency]
+            )
