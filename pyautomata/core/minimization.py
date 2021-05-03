@@ -5,7 +5,7 @@ with removal of unreachable states and the unification
 of non-distinguishable states.
 """
 import copy
-from typing import Dict, List, Set, Tuple
+from typing import List, Set
 
 from pyautomata import Automata  # pylint: disable=import-error
 
@@ -13,14 +13,8 @@ from pyautomata import Automata  # pylint: disable=import-error
 class MinimizedAutomata(Automata):
     """
     Class that does the DFA minimization.
-    Done automatically on constructor, no further action needed.
+    Opted for a method that minimizes, to faciliate tests.
     """
-    def __init__(
-        self, program_function: Dict[Tuple[str, str], str], **kwargs
-    ) -> None:
-        super().__init__(program_function, **kwargs)
-        self.remove_unreachable_states()
-        self.unify_states()
 
     def remove_unreachable_states(self) -> None:
         """
@@ -31,6 +25,13 @@ class MinimizedAutomata(Automata):
             for c in self.alphabet:
                 if (state, c) in self.program_function:
                     self.program_function.pop((state, c))
+
+    def minimize(self):
+        """
+        Does the minimization by doing all the steps
+        """
+        self.remove_unreachable_states()
+        self.unify_states()
 
     def unreacheable_states(self) -> List[str]:
         """
@@ -54,13 +55,15 @@ class MinimizedAutomata(Automata):
         unreachable_states = set(self.states) - reacheable_states
         return list(unreachable_states)
 
-    def make_state_name(self, states: frozenset[str]) -> str:
+    @staticmethod
+    def make_state_name(states: frozenset[str]) -> str:
         """
         Makes the new name for the set of states, possibly with just one state
         This is made to guarantee the name are always in the same order
         """
         seen = {}
         new_list = [seen.setdefault(x, x) for x in states if x not in seen]
+        new_list.sort()
         return "".join(new_list)
 
     def unify_states(self) -> None:
@@ -68,6 +71,7 @@ class MinimizedAutomata(Automata):
         Using the equivalency classes of the hopcroft
         algorithm, unifies non-distinguishable states
         """
+        # pylint: disable=attribute-defined-outside-init
         equivalency_classes = self.hopcroft_alogrithm()
         equivalency_dict = {}
         new_states = []
@@ -104,16 +108,26 @@ class MinimizedAutomata(Automata):
         https://en.wikipedia.org/wiki/DFA_minimization#Hopcroft's_algorithm
         Adapted to Python (new variables, frozen sets)
         """
+        # the sets need to be frozen, because python
+        # needs set elements to be hashable, and mutable
+        # types can't be hashed for it
         final_states_set = frozenset(self.final_states)
         non_final_states_set = frozenset(self.states) - frozenset(
             self.final_states
         )
         p: Set[frozenset[str]] = set([final_states_set, non_final_states_set])
+        # new_p is used because p needs to change, but
+        # python can't have a collection being changed mid-iteration
         new_p = copy.deepcopy(p)
         w: Set[frozenset[str]] = set([final_states_set, non_final_states_set])
         while w:
             a = w.pop()
+            # the original pseudocode just said "choose an a"
+            # so, just popped one
             for c in self.alphabet:
+                # this set comphrehesion basically means
+                # let x = every state that a transiction with 'c'
+                # that leads to a state in 'a'
                 x = {
                     state
                     for (
@@ -122,20 +136,26 @@ class MinimizedAutomata(Automata):
                     ), result_state in self.program_function.items()
                     if result_state in a and character == c
                 }
+                # p needs to be new_p
+                # due to shallow copy, this is the only way
                 p = copy.deepcopy(new_p)
                 for y in p:
+                    # the comparation with empty set isn't pythonic
+                    # but it seemed more on par with the pseudocode
                     if x & y == set() or y - x == set():
                         continue
                     new_p.remove(y)
-                    new_p.add(frozenset(x & y))
+                    # we used y ∩ x instead of x ∩ y because
+                    # of how python handles sets x frozensets operations
+                    new_p.add(y & x)
                     new_p.add(y - x)
                     if y in w:
                         w.remove(y)
-                        w.add(frozenset(x & y))
+                        w.add(y & x)
                         w.add(y - x)
                     else:
-                        if (x & y) <= (y - x):
-                            w.add(frozenset(x & y))
+                        if len(x & y) <= len(y - x):
+                            w.add(y & x)
                         else:
                             w.add(y - x)
         return p
