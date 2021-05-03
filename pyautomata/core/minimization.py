@@ -39,11 +39,11 @@ class MinimizedAutomata(Automata):
     Opted for a method that minimizes, to faciliate tests.
     """
 
-    def remove_unreachable_states(self) -> None:
+    def remove_states(self, states: Set[str]) -> None:
         """
-        Removes the unreachable states of the Automata
+        Removes the states passed as argument from
+        the automata
         """
-        states = self.unreacheable_states()
         for state in states:
             for c in self.alphabet:
                 if (state, c) in self.program_function:
@@ -54,10 +54,11 @@ class MinimizedAutomata(Automata):
         """
         Does the minimization by doing all the steps
         """
-        self.remove_unreachable_states()
+        self.remove_states(self.unreacheable_states())
         self.unify_states()
+        self.remove_states(self.useless_states())
 
-    def unreacheable_states(self) -> List[str]:
+    def unreacheable_states(self) -> Set[str]:
         """
         Determines the unreachable states of the Automata
         | -> set union
@@ -77,7 +78,7 @@ class MinimizedAutomata(Automata):
             new_states = temp - reacheable_states
             reacheable_states = reacheable_states | new_states
         unreachable_states = set(self.states) - reacheable_states
-        return list(unreachable_states)
+        return unreachable_states
 
     @staticmethod
     def make_state_name(states: frozenset[str]) -> str:
@@ -212,8 +213,23 @@ class MinimizedAutomata(Automata):
             self.mark_as_distinguishable(dep)
         pair.dependicies = set()
 
+    def useless_states(self) -> Set[str]:
+        useful_states = set(self.final_states)
+        changed = True
+        while changed:
+            changed = False
+            for (state, _), result_state in self.program_function.items():
+                if (
+                    result_state in useful_states
+                    and state not in useful_states
+                ):
+                    useful_states.add(state)
+                    changed = True
+        return set(self.states) - useful_states
+
+    @staticmethod
     def create_undistinguishable_sets(
-        self, table: Dict[frozenset[str], TablePair]
+        table: Dict[frozenset[str], TablePair]
     ) -> Set[frozenset[str]]:
         """
         With the table created by the algorithm,
