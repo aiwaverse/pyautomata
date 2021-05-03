@@ -5,7 +5,7 @@ with removal of unreachable states and the unification
 of non-distinguishable states.
 """
 import copy
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Set, Tuple
 from itertools import combinations
 
 from pyautomata import Automata  # pylint: disable=import-error
@@ -46,7 +46,10 @@ class MinimizedAutomata(Automata):
         """
         for state in states:
             for c in self.alphabet:
-                if (state, c) in self.program_function:
+                if (
+                    (state, c) in self.program_function
+                    and state not in self.initial_state
+                ):
                     self.states.remove(state)
                     self.program_function.pop((state, c))
 
@@ -214,6 +217,9 @@ class MinimizedAutomata(Automata):
         pair.dependicies = set()
 
     def useless_states(self) -> Set[str]:
+        """
+        Find the useless tates of an automata
+        """
         useful_states = set(self.final_states)
         changed = True
         while changed:
