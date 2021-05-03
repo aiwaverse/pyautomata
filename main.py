@@ -1,21 +1,23 @@
-from typing import List, Tuple, Union
-
+"""
+The main module of the program
+To run the program, simply run this file,
+after installing the dependencies
+"""
 import PySimpleGUI as sg
-from pyautomata.gui.automata_gui import (
-    create_automata,
-    read_word_file,
-    setup,
-    test_word,
-    test_word_pairs,
-)
+
+from pyautomata.gui.automata_gui import (create_automata, read_word_file,
+                                         setup, test_word, test_word_pairs)
 
 
 def main():
+    """
+    The main function, basically handles everything
+    """
     aut_window = setup()
     automata = None
     while True:
         event, values = aut_window.read()
-        if event == sg.WIN_CLOSED or event == "Close":
+        if event in (sg.WIN_CLOSED, "Close"):
             break
         if event == "-AUTOMATA-SUBMIT-":
             automata = create_automata(aut_window, values["-AUTOMATA-FILE-"])
