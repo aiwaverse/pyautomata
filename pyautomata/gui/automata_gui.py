@@ -1,8 +1,11 @@
+"""
+The GUI functions for the program.
+"""
 from typing import List, Tuple, Union
 
-import pyautomata  # pylint: disable=import-error
 import PySimpleGUI as sg
 from more_itertools import grouper
+import pyautomata  # pylint: disable=import-error
 
 
 def create_automata(window: sg.Window, file: str) -> pyautomata.Automata:
@@ -15,7 +18,9 @@ def create_automata(window: sg.Window, file: str) -> pyautomata.Automata:
     window["-AUTOMATA-LOADED-"].update("Loaded")
     window["-WORD-BUT-"].update(disabled=False)
     window["-WORD-FILE-SUBMIT-"].update(disabled=False)
-    return pyautomata.Automata(function_program, **description)
+    aut = pyautomata.MinimizedAutomata(function_program, **description)
+    aut.minimize()
+    return aut
 
 
 def create_pair_result_window(pairs: List[Tuple[str, str]]) -> None:
@@ -26,14 +31,14 @@ def create_pair_result_window(pairs: List[Tuple[str, str]]) -> None:
     for word1, word2 in pairs:
         pair_string += f"{word1}, {word2}\n"
     layout = [
-        [sg.Text(f"Accepted pairs:")],
+        [sg.Text("Accepted pairs:")],
         [sg.Text(pair_string)],
         [sg.Button("Ok")],
     ]
     window = sg.Window("Pyautomata", layout)
     while True:
         event, _ = window.read()
-        if event == sg.WIN_CLOSED or event == "Ok":
+        if event in (sg.WIN_CLOSED, "Ok"):
             break
     window.close()
 
@@ -86,13 +91,13 @@ def make_result_window(
     result_string = create_result_path_string(reason_or_path)
     if result:
         layout = [
-            [sg.Text(f"Word accepted.")],
+            [sg.Text("Word accepted.")],
             [sg.Text(f"Path:\n{result_string}")],
             [sg.Button("Ok")],
         ]
     else:
         layout = [
-            [sg.Text(f"Word rejected.")],
+            [sg.Text("Word rejected.")],
             [sg.Text(f"Reason:\n{result_string}")],
             [sg.Button("Ok")],
         ]
@@ -100,7 +105,7 @@ def make_result_window(
     result_window = sg.Window("Pyautomata", layout)
     while True:
         event, _ = result_window.read()
-        if event == sg.WIN_CLOSED or event == "Ok":
+        if event in (sg.WIN_CLOSED, "Ok"):
             break
     result_window.close()
 
@@ -116,6 +121,10 @@ def test_word(window: sg.Window, word: str, aut: pyautomata.Automata) -> None:
 
 
 def setup() -> sg.Window:
+    """
+    Function that creates the layout.
+    Returns an window with said layout.
+    """
     sg.theme("DarkGrey8")
     layout = [
         [

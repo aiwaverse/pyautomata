@@ -1,3 +1,7 @@
+"""
+The class that controls the whole Automata.
+The Minimized version is on the minimizaiton module.
+"""
 from typing import List, Dict, Tuple, Union
 import re
 
