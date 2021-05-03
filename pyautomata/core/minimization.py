@@ -5,9 +5,32 @@ with removal of unreachable states and the unification
 of non-distinguishable states.
 """
 import copy
-from typing import List, Set
+from typing import Dict, List, Set, Tuple
+from itertools import combinations
 
 from pyautomata import Automata  # pylint: disable=import-error
+
+
+class TablePair:
+    """
+    The class that represents one element of the table for the
+    Table Filling Algorithm
+    """
+
+    def __init__(self, state1: str, state2: str) -> None:
+        self.state1 = state1
+        self.state2 = state2
+        self.distinguishable = False
+        self.dependicies: Set[TablePair] = set()
+
+    def __iter__(self):
+        return iter(sorted([self.state1, self.state2]))
+
+    def has_undefined(self) -> bool:
+        """
+        Function to tell if undefined is a value in the pair
+        """
+        return self.state1 == "Undefined" or self.state2 == "Undefined"
 
 
 class MinimizedAutomata(Automata):
@@ -24,6 +47,7 @@ class MinimizedAutomata(Automata):
         for state in states:
             for c in self.alphabet:
                 if (state, c) in self.program_function:
+                    self.states.remove(state)
                     self.program_function.pop((state, c))
 
     def minimize(self):
@@ -72,7 +96,7 @@ class MinimizedAutomata(Automata):
         algorithm, unifies non-distinguishable states
         """
         # pylint: disable=attribute-defined-outside-init
-        equivalency_classes = self.hopcroft_alogrithm()
+        equivalency_classes = self.table_filling_algorithm()
         equivalency_dict = {}
         new_states = []
         new_final_states = set()
@@ -160,5 +184,108 @@ class MinimizedAutomata(Automata):
                             w.add(y - x)
         return p
 
+    def total_function(self) -> Dict[Tuple[str, str], str]:
+        """
+        Creates a total function for the DFA
+        """
+        total_fun = {}
+        for state in self.states:
+            for c in self.alphabet:
+                # if the function is undefined, will return "Undefined"
+                # This, obviously, cannot be a valid state in the DFA
+                # This is not checked
+                total_fun[(state, c)] = self.program_function.get(
+                    (state, c), "Undefined"
+                )
+        for c in self.alphabet:
+            total_fun[("Undefined", c)] = "Undefined"
+        return total_fun
 
-# %%
+    def mark_as_distinguishable(self, pair: TablePair) -> None:
+        """
+        Marks a table pair as distinguishable, and recursively
+        marks any pair in it's dependecies
+        Hopefully Python's shallow copy method will help me
+        """
+        pair.distinguishable = True
+        for dep in pair.dependicies:
+            self.mark_as_distinguishable(dep)
+        pair.dependicies = set()
+
+    def create_undistinguishable_sets(
+        self, table: Dict[frozenset[str], TablePair]
+    ) -> Set[frozenset[str]]:
+        """
+        With the table created by the algorithm,
+        creates a set of sets with the equivalency classes.
+        Akin to the result of the hopcroft algorithm, though
+        arguably, slower
+        """
+        undistuinguishables = set()
+        to_return_set = set()
+        for pair in table.values():
+            if pair.has_undefined():
+                continue
+            if not pair.distinguishable:
+                undistuinguishables.add(pair.state1)
+                undistuinguishables.add(pair.state2)
+        for pair in table.values():
+            if pair.has_undefined():
+                continue
+            if pair.distinguishable:
+                if pair.state1 not in undistuinguishables:
+                    to_return_set.add(frozenset([pair.state1]))
+                if pair.state2 not in undistuinguishables:
+                    to_return_set.add(frozenset([pair.state2]))
+            else:
+                to_return_set.add(frozenset(pair))
+        return to_return_set
+
+    def mark_final_and_non_final_pairs(
+        self, table: Dict[frozenset[str], TablePair]
+    ) -> None:
+        """
+        Marks all table pairs that have a combination of final and
+        non-final states
+        """
+        for table_pair in table.values():
+            if (
+                table_pair.state1 in self.final_states
+                and table_pair.state2 not in self.final_states
+                or table_pair.state1 not in self.final_states
+                and table_pair.state2 in self.final_states
+            ):
+                table_pair.distinguishable = True
+
+    def table_filling_algorithm(self) -> Set[frozenset[str]]:
+        """
+        The table filling algorithm, horrific
+        """
+        total_program_function = self.total_function()
+        # all the possible pairs, including Undefined
+        table_pairs = combinations(self.states + ["Undefined"], 2)
+        # the table is a dictionary with pair: TablePair, with
+        # the pair being a frozenset (order doesn't matter, and is hashable)
+        table = {frozenset(pair): TablePair(*pair) for pair in table_pairs}
+        # mark all pairs (final, non-final) or (non-final, final)
+        # as distinguishable
+        self.mark_final_and_non_final_pairs(table)
+        # searches the table
+        for table_pair in table.values():
+            for c in self.alphabet:
+                result_state1 = total_program_function[table_pair.state1, c]
+                result_state2 = total_program_function[table_pair.state2, c]
+                # if they go to the same state, skip letter
+                if result_state1 == result_state2:
+                    continue
+                results_set = frozenset([result_state1, result_state2])
+                # if the result is distinguishable, recursively
+                # mark the dependecies and the pair itself
+                if table[results_set].distinguishable:
+                    self.mark_as_distinguishable(table_pair)
+                # otherwise, add pair to result dependecy list
+                else:
+                    table[results_set].dependicies.add(table_pair)
+        states = self.create_undistinguishable_sets(table)
+        print(states)
+        return states
