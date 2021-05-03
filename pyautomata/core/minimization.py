@@ -267,8 +267,6 @@ class MinimizedAutomata(Automata):
         # the table is a dictionary with pair: TablePair, with
         # the pair being a frozenset (order doesn't matter, and is hashable)
         table = {frozenset(pair): TablePair(*pair) for pair in table_pairs}
-        # mark all pairs (final, non-final) or (non-final, final)
-        # as distinguishable
         self.mark_final_and_non_final_pairs(table)
         # searches the table
         for table_pair in table.values():
