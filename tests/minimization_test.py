@@ -30,10 +30,10 @@ class TestMinimizedAutomata:
         self.aut = MinimizedAutomata(self.program_function, **self.info)
 
     def test_unreachable_states(self):
-        assert self.aut.unreacheable_states() == ["q3"]
+        assert self.aut.unreacheable_states() == {"q3"}
 
     def test_remove_unreachable_states(self):
-        self.aut.remove_unreachable_states()
+        self.aut.remove_states(self.aut.unreacheable_states())
         assert self.aut.program_function == {
             ("q0", "a"): "q1",
             ("q0", "b"): "q5",
