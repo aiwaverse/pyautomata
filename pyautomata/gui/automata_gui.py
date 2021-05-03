@@ -18,7 +18,9 @@ def create_automata(window: sg.Window, file: str) -> pyautomata.Automata:
     window["-AUTOMATA-LOADED-"].update("Loaded")
     window["-WORD-BUT-"].update(disabled=False)
     window["-WORD-FILE-SUBMIT-"].update(disabled=False)
-    return pyautomata.MinimizedAutomata(function_program, **description)
+    aut = pyautomata.MinimizedAutomata(function_program, **description)
+    aut.minimize()
+    return aut
 
 
 def create_pair_result_window(pairs: List[Tuple[str, str]]) -> None:
@@ -36,7 +38,7 @@ def create_pair_result_window(pairs: List[Tuple[str, str]]) -> None:
     window = sg.Window("Pyautomata", layout)
     while True:
         event, _ = window.read()
-        if event == sg.WIN_CLOSED or event == "Ok":
+        if event in (sg.WIN_CLOSED, "Ok"):
             break
     window.close()
 
