@@ -5,9 +5,25 @@ with removal of unreachable states and the unification
 of non-distinguishable states.
 """
 import copy
-from typing import List, Set
+from typing import Dict, List, Set, Tuple
+from itertools import combinations
 
 from pyautomata import Automata  # pylint: disable=import-error
+
+
+class TablePair:
+    """
+    The class that represents one element of the table for the
+    Table Filling Algorithm
+    """
+    def __init__(self, state1: str, state2: str) -> None:
+        self.state1 = state1
+        self.state2 = state2
+        self.distinguishable = False
+        self.dependicies: Set[TablePair] = set()
+
+    def __iter__(self):
+        return iter(sorted([self.state1, self.state2]))
 
 
 class MinimizedAutomata(Automata):
@@ -160,5 +176,69 @@ class MinimizedAutomata(Automata):
                             w.add(y - x)
         return p
 
+    def total_function(self) -> Dict[Tuple[str, str], str]:
+        """
+        Creates a total function for the DFA
+        """
+        total_fun = {}
+        for state in self.states:
+            for c in self.alphabet:
+                # if the function is undefined, will return "Undefined"
+                # This, obviously, cannot be a valid state in the DFA
+                # This is not checked
+                total_fun[(state, c)] = self.program_function.get(
+                    (state, c), "Undefined"
+                )
+        return total_fun
 
-# %%
+    def mark_as_distinguishable(self, pair: TablePair) -> None:
+        """
+        Marks a table pair as distinguishable, and recursively
+        marks any pair in it's dependecies
+        Hopefully Python's shallow copy method will help me
+        """
+        pair.distinguishable = True
+        for dep in pair.dependicies:
+            self.mark_as_distinguishable(dep)
+
+    def table_filling_algorithm(self) -> Set[frozenset[str]]:
+        """
+        The table filling algorithm, horrific
+        """
+        return_set = set()
+        total_program_function = self.total_function()
+        table_pairs = combinations(self.states + ["Undefined"], 2)
+        table = {pair: TablePair(*pair) for pair in table_pairs}
+        for table_pair in table.values():
+            if (
+                table_pair.state1 in self.final_states
+                and table_pair.state2 not in self.final_states
+                or table_pair.state1 not in self.final_states
+                and table_pair.state2 in self.final_states
+            ):
+                table_pair.distinguishable = True
+            else:
+                for c in self.alphabet:
+                    result_state1 = total_program_function[
+                        table_pair.state1, c
+                    ]
+                    result_state2 = total_program_function[
+                        table_pair.state2, c
+                    ]
+                    if result_state1 == result_state2:
+                        continue
+                    if table[(result_state1, result_state2)].distinguishable:
+                        self.mark_as_distinguishable(table_pair)
+                    else:
+                        table[result_state1, result_state2].dependicies.add(
+                            table_pair
+                        )
+        for table_pair in table.values():
+            if table_pair.distinguishable:
+                return_set.add(table_pair.state1)
+                return_set.add(table_pair.state2)
+            else:
+                return_set.add(
+                    frozenset({table_pair.state1, table_pair.state2})
+                )
+        return return_set
