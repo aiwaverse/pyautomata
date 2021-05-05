@@ -213,7 +213,8 @@ class MinimizedAutomata(Automata):
         """
         pair.distinguishable = True
         for dep in pair.dependicies:
-            self.mark_as_distinguishable(dep)
+            if not dep.distinguishable:
+                self.mark_as_distinguishable(dep)
         pair.dependicies = set()
 
     def useless_states(self) -> Set[str]:
@@ -307,5 +308,4 @@ class MinimizedAutomata(Automata):
                 else:
                     table[results_set].dependicies.add(table_pair)
         states = self.create_undistinguishable_sets(table)
-        print(states)
         return states

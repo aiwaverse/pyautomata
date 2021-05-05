@@ -28,8 +28,12 @@ class Automata:
     def break_word(self, word: str) -> List[str]:
         """
         Breaks a word into it's alphabet elements
+        Will raise ValueError if there's an element
+        that isn't part of the alphabet
         """
         re_pattern = "|".join(self.alphabet)
+        if re.sub(re_pattern, "", word):
+            raise ValueError("Word contains non-alphabet characters")
         return re.findall(re_pattern, word)
 
     def check_word(self, word: str) -> Tuple[bool, Union[str, List[str]]]:

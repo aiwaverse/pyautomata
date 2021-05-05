@@ -1,6 +1,4 @@
-import os
-import pytest
-
+# pylint: disable=all
 from pyautomata import AutomataParser  # pylint: disable=import-error
 
 

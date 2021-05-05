@@ -1,14 +1,24 @@
-# %%
+"""
+The Parser module contains the abstract class Parser
+And two concrete instances, WordFileParser and
+AutomataParser
+"""
 import abc
 import re
+from typing import Dict, List, Tuple, Union
+
 from more_itertools import grouper
-from typing import Dict, List, Union, Tuple
 
 
 class Parser(abc.ABC):
+    """
+    Base Parser class
+    """
     @abc.abstractmethod
     def parse(self):
-        pass
+        """
+        parse something
+        """
 
 
 class WordFileParser(Parser):
@@ -47,6 +57,9 @@ class WordFileParser(Parser):
 
 
 class AutomataParser(Parser):
+    """
+    The Parser used to create an automata
+    """
     def __init__(self, *, file_name: str = None, content: str = None) -> None:
         """
         The constructor, either a file_name or a content must be provided
@@ -87,7 +100,7 @@ class AutomataParser(Parser):
         returns a dictionary with the information
         """
         initial_description_results = re.findall(
-            r"\w+(?==\()|(?<={)[\w+,]+(?=})|(?<=,)\w+(?=,)",
+            r"\w+(?==\()|(?<={)[\w*,]*(?=})|(?<=,)\w*(?=,)",
             description,
         )
         return {
