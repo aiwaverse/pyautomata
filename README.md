@@ -18,7 +18,7 @@ On other operational systems, to install the instructions are the same:
 ## File format
 This program requires a DFA file, the expected format is:
 ```
-<M>=({<q0>,...,<qn>},{<s1>,...,<sn>},Prog,<ini>,{ <f0>,...,<fn>})
+<M>=({<q0>,...,<qn>},{<s1>,...,<sn>},Prog,<ini>,{<f0>,...,<fn>})
 Prog
 (<q0>,<s1>)=<q1>
 ...
@@ -28,12 +28,37 @@ Where:
 * ```<M>``` is the automata name.
 * ```{<q0>,...,<qn>}``` are the automata states.
 * ```{<s1>,...,<sn>}``` are the alphabet symbols. 
-*```<ini>```
+* ```<ini>``` is the initial state.
+* ```{<f0>,...,<fn>}``` are the final (accepting) states.
+
+It is of extreme importance that the file has the **exact** same formatting, specially containing no spaces on the file.
+
+The program can also verify a file of word pairs, with the following expected format:
+```
+<w0>,<w2>
+<w2>,<w3>
+```
+Where ```wn``` is a word in the language of the automata.
 ## Usage
 The program can be run directly with Python:
 ```bash
 python main.py
 ```
+![First Screen](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/program_initial.png)
+
+You must them browse and submit the file where the automata is defined:
+![Defined Automata](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/program_automata_submitter.png)
+
+You may now test for individual words, where the result will appear in a new window, alongside the path the program used to aprove the words, or, if it was rejected, the reason why.
+
+![Word Accepted](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/word_accepted.png)
+
+You can also verify using a file of word pairs, where the result will be all pairs that had both words accepted.
+
+![Final program](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/program_final.png)
+
+![Pairs](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/pairs.png)
+
 It can also be used inside other Python codes:
 ```python
 import pyautomata
@@ -43,11 +68,6 @@ description, function_program = p.parse()
 aut = pyautomata.Automata(function_program, **description)
 print(aut.check_word("aab")) # will print the result
 ```
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
