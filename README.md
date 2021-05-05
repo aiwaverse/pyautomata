@@ -44,20 +44,20 @@ The program can be run directly with Python:
 ```bash
 python main.py
 ```
-![First Screen](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/program_initial.png)
+![First Screen](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/main/images/program_initial.png)
 
 You must them browse and submit the file where the automata is defined:
-![Defined Automata](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/program_automata_submitter.png)
+![Defined Automata](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/main/images/program_automata_submitter.png)
 
 You may now test for individual words, where the result will appear in a new window, alongside the path the program used to aprove the words, or, if it was rejected, the reason why.
 
-![Word Accepted](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/word_accepted.png)
+![Word Accepted](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/main/images/word_accepted.png)
 
 You can also verify using a file of word pairs, where the result will be all pairs that had both words accepted.
 
-![Final program](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/program_final.png)
+![Final program](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/main/images/program_final.png)
 
-![Pairs](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/GUI-Refactor/images/pairs.png)
+![Pairs](https://raw.githubusercontent.com/aiwaverse/pyautomata-git/main/images/pairs.png)
 
 It can also be used inside other Python codes:
 ```python
