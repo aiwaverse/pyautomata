@@ -30,6 +30,7 @@ Where:
 * ```{<s1>,...,<sn>}``` are the alphabet symbols. 
 * ```<ini>``` is the initial state.
 * ```{<f0>,...,<fn>}``` are the final (accepting) states.
+* ```(<qn>,<sn>)=<q0>``` is a transiction, each line contains one, and together they make the program function of the Automata.
 
 It is of extreme importance that the file has the **exact** same formatting, specially containing no spaces on the file.
 
