@@ -18,7 +18,7 @@ class AutomataGUI:
         layout = [
             [
                 sg.Text("Automata: "),
-                sg.Text("Not loaded", key="-AUTOMATA-LOADED-"),
+                sg.Text("Not loaded", size=(50, 1), key="-AUTOMATA-LOADED-"),
             ],
             [
                 sg.Text("Last word:"),
@@ -38,7 +38,11 @@ class AutomataGUI:
             [
                 sg.Text("Words File", size=(16, 1)),
                 sg.Input(key="-WORD-FILE-"),
-                sg.FileBrowse(file_types=(("Text Files", "*.txt"),)),
+                sg.FileBrowse(
+                    file_types=(("Text Files", "*.txt"),),
+                    disabled=True,
+                    key="-WORD-FILE-BROWSER-",
+                ),
                 sg.Submit(key="-WORD-FILE-SUBMIT-", disabled=True),
             ],
             [sg.CloseButton("Close")],
@@ -79,15 +83,22 @@ class AutomataGUI:
         Creates the automata via the Parser
         Updates the text and buttons on screen
         """
-        p = pyautomata.AutomataParser(file_name=file)
-        description, function_program = p.parse()
-        self.window["-AUTOMATA-LOADED-"].update("Loaded")
-        self.window["-WORD-BUT-"].update(disabled=False)
-        self.window["-WORD-FILE-SUBMIT-"].update(disabled=False)
-        self._aut = pyautomata.MinimizedAutomata(
-            function_program, **description
-        )
-        self._aut.minimize()
+        try:
+            p = pyautomata.AutomataParser(file_name=file)
+            description, function_program = p.parse()
+            automata = pyautomata.MinimizedAutomata(
+                function_program, **description
+            )
+            automata.minimize()
+            self._aut = automata
+            self.window["-AUTOMATA-LOADED-"].update(
+                f"{automata.name} (Loaded)"
+            )
+            self.window["-WORD-BUT-"].update(disabled=False)
+            self.window["-WORD-FILE-SUBMIT-"].update(disabled=False)
+            self.window["-WORD-FILE-BROWSER-"].update(disabled=False)
+        except KeyError as _:
+            sg.popup_error("The file was incorrectly formatted.")
 
     @staticmethod
     def create_pair_result_window(pairs: List[Tuple[str, str]]) -> None:
@@ -173,8 +184,12 @@ class AutomataGUI:
     def test_word(self, word: str) -> None:
         """
         Tests a word on the automata
-        And draws a window with the results
+        Updates gui and draws a window with the results
         """
-        self.window["-WORD-TO-TEST-"].update(word)
-        result, reason_or_path = self.automata.check_word(word)
-        self.make_result_window(result, reason_or_path)
+        try:
+            result, reason_or_path = self.automata.check_word(word)
+        except ValueError:
+            sg.popup_error("Word contained non-alphabet tokens")
+        else:
+            self.window["-WORD-TO-TEST-"].update(word)
+            self.make_result_window(result, reason_or_path)
