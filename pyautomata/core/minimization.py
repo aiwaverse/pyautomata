@@ -4,6 +4,9 @@ This class is responsible for handling the DFA minimization,
 with removal of unreachable states and the unification
 of non-distinguishable states.
 """
+# This whole module uses the method version of set operations
+# instead of the actual operators, end result is the same,
+# this was made to facilitate understanding.
 import copy
 from typing import Dict, FrozenSet, Set, Tuple
 from itertools import combinations
@@ -64,9 +67,6 @@ class MinimizedAutomata(Automata):
     def unreacheable_states(self) -> Set[str]:
         """
         Determines the unreachable states of the Automata
-        | -> set union
-        & -> set intersection
-        - -> set difference
         """
         reacheable_states: Set[str] = set([self.initial_state])
         new_states: Set[str] = set([self.initial_state])
@@ -74,13 +74,20 @@ class MinimizedAutomata(Automata):
             temp: Set[str] = set()
             for q in new_states:
                 for c in self.alphabet:
+                    # this uses the empty string to maintain p typing
+                    # I didn't want to annoy Pyright
                     p = self.program_function.get((q, c), "")
+                    # if p is the empty string (i.e no transition with (q,c))
+                    # continues the iteration
                     if not p:
                         continue
-                    temp = temp | set([p])
+                    temp.add(p)
+            # if temp == reachable states
+            # new_states will be empty, and fail the while
+            # exactly what we want
             new_states = temp - reacheable_states
-            reacheable_states = reacheable_states | new_states
-        unreachable_states = set(self.states) - reacheable_states
+            reacheable_states = reacheable_states.union(new_states)
+        unreachable_states = set(self.states).difference(reacheable_states)
         return unreachable_states
 
     @staticmethod
@@ -129,6 +136,8 @@ class MinimizedAutomata(Automata):
         self.states = new_states
         self.program_function = new_program_function
 
+    # ultimately not used in the program
+    # But I decided to leave it here
     def hopcroft_alogrithm(self) -> Set[FrozenSet[str]]:
         """
         The Hopcroft Algorithm, following the pseudocode
