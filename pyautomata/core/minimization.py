@@ -5,7 +5,7 @@ with removal of unreachable states and the unification
 of non-distinguishable states.
 """
 import copy
-from typing import Dict, Set, Tuple
+from typing import Dict, FrozenSet, Set, Tuple
 from itertools import combinations
 
 from pyautomata import Automata  # pylint: disable=import-error
@@ -84,7 +84,7 @@ class MinimizedAutomata(Automata):
         return unreachable_states
 
     @staticmethod
-    def make_state_name(states: frozenset[str]) -> str:
+    def make_state_name(states: FrozenSet[str]) -> str:
         """
         Makes the new name for the set of states, possibly with just one state
         This is made to guarantee the name are always in the same order
@@ -129,7 +129,7 @@ class MinimizedAutomata(Automata):
         self.states = new_states
         self.program_function = new_program_function
 
-    def hopcroft_alogrithm(self) -> Set[frozenset[str]]:
+    def hopcroft_alogrithm(self) -> Set[FrozenSet[str]]:
         """
         The Hopcroft Algorithm, following the pseudocode
         found in:
@@ -143,11 +143,11 @@ class MinimizedAutomata(Automata):
         non_final_states_set = frozenset(self.states) - frozenset(
             self.final_states
         )
-        p: Set[frozenset[str]] = set([final_states_set, non_final_states_set])
+        p: Set[FrozenSet[str]] = set([final_states_set, non_final_states_set])
         # new_p is used because p needs to change, but
         # python can't have a collection being changed mid-iteration
         new_p = copy.deepcopy(p)
-        w: Set[frozenset[str]] = set([final_states_set, non_final_states_set])
+        w: Set[FrozenSet[str]] = set([final_states_set, non_final_states_set])
         while w:
             a = w.pop()
             # the original pseudocode just said "choose an a"
@@ -236,8 +236,8 @@ class MinimizedAutomata(Automata):
 
     @staticmethod
     def create_undistinguishable_sets(
-        table: Dict[frozenset[str], TablePair]
-    ) -> Set[frozenset[str]]:
+        table: Dict[FrozenSet[str], TablePair]
+    ) -> Set[FrozenSet[str]]:
         """
         With the table created by the algorithm,
         creates a set of sets with the equivalency classes.
@@ -265,7 +265,7 @@ class MinimizedAutomata(Automata):
         return to_return_set
 
     def mark_final_and_non_final_pairs(
-        self, table: Dict[frozenset[str], TablePair]
+        self, table: Dict[FrozenSet[str], TablePair]
     ) -> None:
         """
         Marks all table pairs that have a combination of final and
@@ -280,7 +280,7 @@ class MinimizedAutomata(Automata):
             ):
                 table_pair.distinguishable = True
 
-    def table_filling_algorithm(self) -> Set[frozenset[str]]:
+    def table_filling_algorithm(self) -> Set[FrozenSet[str]]:
         """
         The table filling algorithm, horrific
         """
