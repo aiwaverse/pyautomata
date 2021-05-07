@@ -66,8 +66,12 @@ class TestMinimizedAutomata:
     def test_unify_states(self):
         # this does not test removal of unreachable states
         # hence the inclusion of q3
+        # unify_states also "totalizes" the program function
+        # this is removed under minimize
         self.aut.unify_states()
         assert self.aut.program_function == {
+            ("Undefined", "a"): "Undefined",
+            ("Undefined", "b"): "Undefined",
             ("q0q4", "a"): "q1q7",
             ("q0q4", "b"): "q5",
             ("q1q7", "a"): "q6",
@@ -75,8 +79,10 @@ class TestMinimizedAutomata:
             ("q2", "a"): "q0q4",
             ("q2", "b"): "q2",
             ("q3", "a"): "q2",
+            ("q3", "b"): "Undefined",
             ("q5", "a"): "q2",
             ("q5", "b"): "q6",
+            ("q6", "a"): "Undefined",
             ("q6", "b"): "q0q4",
         }
 
