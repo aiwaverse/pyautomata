@@ -50,8 +50,8 @@ class MinimizedAutomata(Automata):
                     (state, c) in self.program_function
                     and state not in self.initial_state
                 ):
-                    self.states.remove(state)
                     self.program_function.pop((state, c))
+            self.states.remove(state)
 
     def minimize(self):
         """
