@@ -126,15 +126,18 @@ class AutomataGUI:
         Creates the pairs, then test them
         Opens up a new window with the results
         """
-        wfp = pyautomata.WordFileParser(file_name=file)
-        result_pairs = []
-        for word1, word2 in wfp.parse():
-            if (
-                self.automata.check_word(word1)[0]
-                and self.automata.check_word(word2)[0]
-            ):
-                result_pairs.append((word1, word2))
-        self.create_pair_result_window(result_pairs)
+        try:
+            wfp = pyautomata.WordFileParser(file_name=file)
+            result_pairs = []
+            for word1, word2 in wfp.parse():
+                if (
+                    self.automata.check_word(word1)[0]
+                    and self.automata.check_word(word2)[0]
+                ):
+                    result_pairs.append((word1, word2))
+            self.create_pair_result_window(result_pairs)
+        except ValueError as ve:
+            sg.popup_error(ve)
 
     @staticmethod
     def create_result_path_string(result_path: Union[str, List[str]]) -> str:
