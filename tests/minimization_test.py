@@ -6,10 +6,10 @@ class TestMinimizedAutomata:
     def setup_method(self):
         self.info = {
             "name": "AUTÔMATO",
-            "states": ["q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7"],
-            "alphabet": ["a", "b"],
+            "states": {"q0", "q1", "q2", "q3", "q4", "q5", "q6", "q7"},
+            "alphabet": {"a", "b"},
             "initial_state": "q0",
-            "final_states": ["q2"],
+            "final_states": {"q2"},
         }
         self.program_function = {
             ("q0", "a"): "q1",

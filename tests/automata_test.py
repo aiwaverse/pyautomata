@@ -1,14 +1,15 @@
-from pyautomata import Automata  # pylint: disable=import-error
+# pylint: disable=all
+from pyautomata import Automata
 
 
 class TestAutomata:
     def setup_method(self):
         self.info = {
             "name": "AUTÔMATO",
-            "states": ["q0", "q1", "q2", "q3"],
-            "alphabet": ["a", "b"],
+            "states": {"q0", "q1", "q2", "q3"},
+            "alphabet": {"a", "b"},
             "initial_state": "q0",
-            "final_states": ["q1", "q3"],
+            "final_states": {"q1", "q3"},
         }
         self.program_function = {
             ("q0", "a"): "q1",

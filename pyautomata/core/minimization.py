@@ -109,12 +109,12 @@ class MinimizedAutomata(Automata):
         # pylint: disable=attribute-defined-outside-init
         equivalency_classes = self.table_filling_algorithm()
         equivalency_dict = {}
-        new_states = []
+        new_states: Set[str] = set()
         new_final_states = set()
         for ec in equivalency_classes:
             # we make the new name, and add it to the new_states
             name = self.make_state_name(ec)
-            new_states.append(name)
+            new_states.add(name)
             for elem in ec:
                 # to each element in the eq class
                 # we add it to a dict with the right name
@@ -132,7 +132,7 @@ class MinimizedAutomata(Automata):
             new_program_function[
                 (equivalency_dict[state], c)
             ] = equivalency_dict[result_state]
-        self.final_states = list(new_final_states)
+        self.final_states = new_final_states
         self.states = new_states
         self.program_function = new_program_function
 
@@ -290,9 +290,10 @@ class MinimizedAutomata(Automata):
         The table filling algorithm, as seen in class
         Or at least the closest I could get
         """
+        # pylint: disable=attribute-defined-outside-init
         self.program_function = self.total_function()
         # all the possible pairs, including Undefined
-        table_pairs = combinations(self.states + ["Undefined"], 2)
+        table_pairs = combinations(self.states.union({"Undefined"}), 2)
         # the table is a dictionary with pair: TablePair, with
         # the pair being a frozenset (order doesn't matter, and is hashable)
         table = {frozenset(pair): TablePair(*pair) for pair in table_pairs}
