@@ -47,13 +47,13 @@ class MinimizedAutomata(Automata):
         Removes the states passed as argument from
         the automata
         """
+        # pylint: disable=attribute-defined-outside-init
+        new_program_function = copy.deepcopy(self.program_function)
+        for (i_state, c), f_state in self.program_function.items():
+            if i_state in states or f_state in states:
+                new_program_function.pop((i_state, c))
+        self.program_function = new_program_function
         for state in states:
-            for c in self.alphabet:
-                if (
-                    (state, c) in self.program_function
-                    and state not in self.initial_state
-                ):
-                    self.program_function.pop((state, c))
             self.states.remove(state)
 
     def minimize(self):
@@ -290,7 +290,7 @@ class MinimizedAutomata(Automata):
         The table filling algorithm, as seen in class
         Or at least the closest I could get
         """
-        total_program_function = self.total_function()
+        self.program_function = self.total_function()
         # all the possible pairs, including Undefined
         table_pairs = combinations(self.states + ["Undefined"], 2)
         # the table is a dictionary with pair: TablePair, with
@@ -300,8 +300,8 @@ class MinimizedAutomata(Automata):
         # searches the table
         for table_pair in table.values():
             for c in self.alphabet:
-                result_state1 = total_program_function[table_pair.state1, c]
-                result_state2 = total_program_function[table_pair.state2, c]
+                result_state1 = self.program_function[table_pair.state1, c]
+                result_state2 = self.program_function[table_pair.state2, c]
                 # if they go to the same state, skip letter
                 if result_state1 == result_state2:
                     continue
