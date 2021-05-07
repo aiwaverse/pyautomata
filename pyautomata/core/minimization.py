@@ -256,14 +256,10 @@ class MinimizedAutomata(Automata):
         undistuinguishables = set()
         to_return_set = set()
         for pair in table.values():
-            if pair.has_undefined():
-                continue
             if not pair.distinguishable:
                 undistuinguishables.add(pair.state1)
                 undistuinguishables.add(pair.state2)
         for pair in table.values():
-            if pair.has_undefined():
-                continue
             if pair.distinguishable:
                 if pair.state1 not in undistuinguishables:
                     to_return_set.add(frozenset([pair.state1]))
@@ -291,7 +287,8 @@ class MinimizedAutomata(Automata):
 
     def table_filling_algorithm(self) -> Set[FrozenSet[str]]:
         """
-        The table filling algorithm, horrific
+        The table filling algorithm, as seen in class
+        Or at least the closest I could get
         """
         total_program_function = self.total_function()
         # all the possible pairs, including Undefined
