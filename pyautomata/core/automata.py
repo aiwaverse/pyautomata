@@ -2,7 +2,7 @@
 The class that controls the whole Automata.
 The Minimized version is on the minimizaiton module.
 """
-from typing import List, Dict, Tuple, Union
+from typing import List, Dict, Tuple, Union, Set
 import re
 
 
@@ -19,10 +19,10 @@ class Automata:
         and the unpacked dictionary of info
         """
         self.name: str = kwargs["name"]
-        self.states: List[str] = kwargs["states"]
-        self.alphabet: List[str] = kwargs["alphabet"]
+        self.states: Set[str] = kwargs["states"]
+        self.alphabet: Set[str] = kwargs["alphabet"]
         self.initial_state: str = kwargs["initial_state"]
-        self.final_states: List[str] = kwargs["final_states"]
+        self.final_states: Set[str] = kwargs["final_states"]
         self.program_function: Dict[Tuple[str, str], str] = program_function
 
     def break_word(self, word: str) -> List[str]:
@@ -59,3 +59,11 @@ class Automata:
         if curr_state not in self.final_states:
             return (False, f"Program ended on non-final state {curr_state}.")
         return (True, path)
+
+    def __str__(self) -> str:
+        return_string = f"{self.name}=("
+        return_string += f"{self.states},{self.alphabet},Prog,"
+        return_string += f"{self.initial_state},{self.final_states})\nProg\n"
+        for (i_state, c), f_state in self.program_function.items():
+            return_string += f"({i_state},{c})={f_state}\n"
+        return return_string

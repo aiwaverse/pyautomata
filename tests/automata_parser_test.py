@@ -24,24 +24,24 @@ class TestAutomataParser:
         assert self.description_dict["name"] == "AUTÔMATO"
 
     def test_states(self):
-        assert self.description_dict["states"] == [
+        assert self.description_dict["states"] == {
             "q0",
             "q1",
             "q2",
             "q3",
-        ]
+        }
 
     def test_alphabet(self):
-        assert self.description_dict["alphabet"] == ["a", "b"]
+        assert self.description_dict["alphabet"] == {"a", "b"}
 
     def test_initial_state(self):
         assert self.description_dict["initial_state"] == "q0"
 
     def test_final_states(self):
-        assert self.description_dict["final_states"], [
+        assert self.description_dict["final_states"] == {
             "q1",
             "q3",
-        ]
+        }
 
     def test_transitions(self):
         assert self.function_dict[("q0", "a")] == "q1"

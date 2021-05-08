@@ -5,7 +5,7 @@ AutomataParser
 """
 import abc
 import re
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Set
 
 from more_itertools import grouper
 
@@ -94,7 +94,7 @@ class AutomataParser(Parser):
     @staticmethod
     def description_parse(
         description: str,
-    ) -> Dict[str, Union[str, List[str]]]:
+    ) -> Dict[str, Union[str, Set[str]]]:
         """
         Parses the description line
         returns a dictionary with the information
@@ -105,10 +105,10 @@ class AutomataParser(Parser):
         )
         return {
             "name": initial_description_results[0],
-            "states": initial_description_results[1].split(","),
-            "alphabet": initial_description_results[2].split(","),
+            "states": set(initial_description_results[1].split(",")),
+            "alphabet": set(initial_description_results[2].split(",")),
             "initial_state": initial_description_results[4],
-            "final_states": initial_description_results[5].split(","),
+            "final_states": set(initial_description_results[5].split(",")),
         }
 
     @staticmethod
@@ -131,7 +131,7 @@ class AutomataParser(Parser):
 
     def parse(
         self,
-    ) -> Tuple[Dict[str, Union[str, List[str]]], Dict[Tuple[str, str], str]]:
+    ) -> Tuple[Dict[str, Union[str, Set[str]]], Dict[Tuple[str, str], str]]:
         """
         Run the whole parsing
         Returns 2 dictionaries: (description, program function)
