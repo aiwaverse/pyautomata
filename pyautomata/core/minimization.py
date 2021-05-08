@@ -42,6 +42,16 @@ class MinimizedAutomata(Automata):
     Opted for a method that minimizes, to faciliate tests.
     """
 
+    def __init__(
+        self,
+        program_function: Dict[Tuple[str, str], str],
+        *,
+        debug=False,
+        **kwargs
+    ) -> None:
+        super().__init__(program_function, **kwargs)
+        self._debug = debug
+
     def remove_states(self, states: Set[str]) -> None:
         """
         Removes the states passed as argument from
@@ -59,9 +69,13 @@ class MinimizedAutomata(Automata):
         """
         Does the minimization by doing all the steps
         """
+        if self._debug:
+            print(self)
         self.remove_states(self.unreacheable_states())
         self.unify_states()
         self.remove_states(self.useless_states())
+        if self._debug:
+            print(self)
 
     def unreacheable_states(self) -> Set[str]:
         """
