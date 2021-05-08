@@ -18,7 +18,6 @@ class Automata:
         To initialize an Automata, pass the program function dictionary
         and the unpacked dictionary of info
         """
-        print(kwargs)
         self.name: str = kwargs["name"]
         self.states: Set[str] = kwargs["states"]
         self.alphabet: Set[str] = kwargs["alphabet"]
@@ -60,3 +59,11 @@ class Automata:
         if curr_state not in self.final_states:
             return (False, f"Program ended on non-final state {curr_state}.")
         return (True, path)
+
+    def __str__(self) -> str:
+        return_string = f"{self.name}=("
+        return_string += f"{self.states},{self.alphabet},Prog,"
+        return_string += f"{self.initial_state},{self.final_states})\nProg\n"
+        for (i_state, c), f_state in self.program_function.items():
+            return_string += f"({i_state},{c})={f_state}\n"
+        return return_string
