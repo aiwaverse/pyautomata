@@ -124,7 +124,6 @@ class AutomataParser(Parser):
         program_function_results = re.findall(
             r"(?<=\()\w+,\w+(?=\)=)|(?<==)\w+", program_function
         )
-        print(program_function_results)
         grouped = grouper(program_function_results, 2)
         return_dict = {}
         for group in grouped:
