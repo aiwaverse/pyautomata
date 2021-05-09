@@ -14,6 +14,7 @@ class Parser(abc.ABC):
     """
     Base Parser class
     """
+
     @abc.abstractmethod
     def parse(self):
         """
@@ -33,7 +34,7 @@ class WordFileParser(Parser):
         If none are provided, ValueError is raised
         """
         if file_name:
-            with open(file_name) as f:
+            with open(file_name, encoding="utf-8") as f:
                 self.content = f.read()
         elif content:
             self.content = content
@@ -60,6 +61,7 @@ class AutomataParser(Parser):
     """
     The Parser used to create an automata
     """
+
     def __init__(self, *, file_name: str = None, content: str = None) -> None:
         """
         The constructor, either a file_name or a content must be provided
@@ -67,7 +69,7 @@ class AutomataParser(Parser):
         If none are provided, ValueError is raised
         """
         if file_name:
-            with open(file_name) as f:
+            with open(file_name, encoding="utf-8") as f:
                 self.content = f.read()
         elif content:
             self.content = content
@@ -122,6 +124,7 @@ class AutomataParser(Parser):
         program_function_results = re.findall(
             r"(?<=\()\w+,\w+(?=\)=)|(?<==)\w+", program_function
         )
+        print(program_function_results)
         grouped = grouper(program_function_results, 2)
         return_dict = {}
         for group in grouped:
@@ -142,5 +145,6 @@ class AutomataParser(Parser):
         description_dict = self.description_parse(initial_description)
         program_dict = self.program_function_parse(program_function)
         return description_dict, program_dict
+
 
 # %%
