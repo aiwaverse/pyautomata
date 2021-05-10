@@ -63,6 +63,7 @@ class MinimizedAutomata(Automata):
             if i_state in states or f_state in states:
                 new_program_function.pop((i_state, c))
         self.program_function = new_program_function
+        self.final_states.difference_update(states)
         self.states.difference_update(states)
 
     def minimize(self):
