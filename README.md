@@ -11,6 +11,8 @@ git clone https://github.com/aiwaverse/pyautomata-git
 cd pytautomata-git
 pip install -r requirements.txt
 ```
+Tkinter is required for this project, it's included on Windows, and can be installed on other operational systems, often the package is named ```python3-tk``` or ```python3-tkinter```
+
 On other operational systems, to install the instructions are the same:
 1. Clone this repository
 2. Enter the folder
